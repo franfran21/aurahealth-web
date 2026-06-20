@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export const Header = () => {
-  const { token, userName, logout } = useAuthStore();
+  const { token, isGuest, userName, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -22,6 +22,12 @@ export const Header = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+    setMobileMenuOpen(false);
+  };
+
+  const handleRegisterFromGuest = () => {
+    logout();
+    navigate('/registro');
     setMobileMenuOpen(false);
   };
 
@@ -38,6 +44,22 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-accent-pink/20">
+      {/* Guest Banner */}
+      {isGuest && (
+        <div className="bg-gradient-to-r from-accent-pink/20 to-brand-primary/5 border-b border-accent-pink/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between text-xs">
+            <span className="text-text-secondary">
+              🌙 Explorando como invitada — tus datos no se guardarán
+            </span>
+            <button
+              onClick={handleRegisterFromGuest}
+              className="font-bold text-brand-primary hover:text-brand-primaryLight transition-colors"
+            >
+              Crear código gratis
+            </button>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
@@ -51,7 +73,7 @@ export const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          {token ? (
+          {(token || isGuest) ? (
             <nav className="hidden md:flex space-x-1 lg:space-x-4 items-center">
               {links.map((link) => {
                 const Icon = link.icon;
@@ -109,10 +131,10 @@ export const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-lg border-b border-accent-pink/10 px-2 pt-2 pb-4 space-y-1">
-          {token ? (
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white/95 backdrop-blur-lg border-b border-accent-pink/10 px-2 pt-2 pb-4 space-y-1">
+              {(token || isGuest) ? (
             <>
               {links.map((link) => {
                 const Icon = link.icon;

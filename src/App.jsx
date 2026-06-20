@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -15,10 +15,10 @@ import PredictionsPage from './pages/PredictionsPage';
 import ProfilePage from './pages/ProfilePage';
 import { Info, X } from 'lucide-react';
 
-// Wrapper for protecting private routes
+// Wrapper for protecting private routes (allows guest mode)
 const ProtectedRoute = ({ children }) => {
-  const { token } = useAuthStore();
-  if (!token) {
+  const { token, isGuest } = useAuthStore();
+  if (!token && !isGuest) {
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -27,8 +27,16 @@ const ProtectedRoute = ({ children }) => {
 // Global handlers helper component to access router context
 const GlobalEventHandlers = () => {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { logout, enterAsGuest } = useAuthStore();
+  const [searchParams] = useSearchParams();
   const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    // Handle guest mode from URL param
+    if (searchParams.get('guest') === '1') {
+      enterAsGuest();
+    }
+  }, []);
 
   useEffect(() => {
     // 1. Manejo de desautorización 401

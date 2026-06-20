@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Calendar, Heart, ShieldAlert, ArrowRight, MessageCircle } from 'lucide-react';
+import { Sparkles, Calendar, Heart, ShieldAlert, ArrowRight, MessageCircle, Eye, UserPlus } from 'lucide-react';
 
 export const LandingPage = () => {
   return (
@@ -31,14 +31,24 @@ export const LandingPage = () => {
               to="/registro"
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-brand-primary text-white font-semibold text-lg hover:bg-brand-primaryLight shadow-lg shadow-brand-primary/10 hover:shadow-xl hover:shadow-brand-primary/20 transition-all active:scale-95"
             >
-              Comenzar gratis
+              <UserPlus className="w-5 h-5" />
+              Crear mi código gratis
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               to="/login"
               className="w-full sm:w-auto flex items-center justify-center px-8 py-4 rounded-full border-2 border-brand-primary text-brand-primary font-semibold text-lg hover:bg-brand-primary/5 transition-all"
             >
-              Iniciar Sesión
+              Ya tengo código
+            </Link>
+          </div>
+          <div className="mt-6">
+            <Link
+              to="/home?guest=1"
+              className="inline-flex items-center gap-1.5 text-sm text-text-secondary/50 hover:text-brand-primary transition-colors group"
+            >
+              <Eye className="w-4 h-4" />
+              <span className="border-b border-dotted border-text-secondary/20 group-hover:border-brand-primary/30">Explorar sin registro — experiencia limitada</span>
             </Link>
           </div>
         </div>

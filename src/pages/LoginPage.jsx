@@ -1,34 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
-import { ShieldAlert, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { ShieldAlert, LogIn, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const { login, loading, error } = useAuthStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState('');
   const [localError, setLocalError] = useState('');
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError('');
 
-    if (!email.trim() || !password.trim()) {
-      setLocalError('Por favor, completa todos los campos.');
+    const code = username.trim();
+    if (!code) {
+      setLocalError('Ingresa tu código para continuar.');
       return;
     }
 
-    if (!emailRegex.test(email.trim())) {
-      setLocalError('Ingresa un correo electrónico válido.');
-      return;
-    }
-
-    const res = await login(email.trim(), password);
+    const res = await login(code);
     if (res.success) {
       navigate('/home');
     }
@@ -37,86 +29,71 @@ export const LoginPage = () => {
   return (
     <div className="flex-1 flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-background-primary/30">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex w-12 h-12 rounded-full bg-brand-primary items-center justify-center text-white text-2xl font-bold shadow-md shadow-brand-primary/20 mb-4">
-          A
+        <Link to="/" className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-rose to-brand-primary items-center justify-center text-white text-3xl font-bold shadow-lg shadow-brand-primary/20 mb-5">
+          🌙
         </Link>
-        <h2 className="font-serif text-3xl font-bold text-text-primary">
-          Bienvenida de nuevo
+        <h2 className="font-serif text-4xl font-bold text-text-primary">
+          Bienvenida de vuelta
         </h2>
         <p className="mt-2 text-sm text-text-secondary">
-          Tu balance y bienestar te esperan.
+          Ingresa tu código personal para continuar.
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 border border-accent-pink/10 shadow-xl rounded-3xl sm:px-10">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+        <div className="bg-white py-10 px-6 border border-accent-pink/10 shadow-xl rounded-3xl sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Display errors */}
             {(error || localError) && (
-              <div className="rounded-xl bg-red-50 p-4 border border-red-100 flex items-start gap-2.5 text-xs text-red-700 animate-fade-in">
+              <div className="rounded-xl bg-red-50 p-4 border border-red-100 flex items-start gap-2.5 text-xs text-red-700">
                 <ShieldAlert className="w-5 h-5 flex-shrink-0 text-red-500" />
                 <span className="font-medium">{localError || error}</span>
               </div>
             )}
 
-            <div>
-              <label htmlFor="email" className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 ml-1">
-                Correo electrónico
-              </label>
+            <div className="text-center">
               <input
-                id="email"
-                type="email"
+                id="username"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nombre@ejemplo.com"
-                className="w-full bg-background-primary/30 border border-gray-200 focus:border-brand-primary/45 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary/30 transition-all"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Tu código"
+                className="w-64 bg-background-primary/40 border-2 border-brand-primary/20 focus:border-brand-primary rounded-2xl px-5 py-4 text-lg font-bold text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all uppercase placeholder:normal-case placeholder:tracking-normal placeholder:text-sm placeholder:text-text-secondary/30"
+                autoFocus
+                autoComplete="off"
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2 ml-1">
-                Contraseña
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-background-primary/30 border border-gray-200 focus:border-brand-primary/45 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary/30 transition-all pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary/50 hover:text-brand-primary transition-colors focus:outline-none"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <Button
-                type="submit"
-                variant="primary"
-                loading={loading}
-                className="w-full py-3.5 text-base font-semibold"
-              >
-                Entrar
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              variant="primary"
+              loading={loading}
+              className="w-full py-3.5 text-base font-semibold"
+            >
+              <LogIn className="w-4 h-4 mr-1.5" />
+              Entrar
+            </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-text-secondary">
-              ¿Eres nueva?{' '}
-              <Link to="/registro" className="font-semibold text-brand-primary hover:text-brand-primaryLight hover:underline transition-all">
-                Crea una cuenta
+              ¿No tienes código?{' '}
+              <Link to="/registro" className="font-semibold text-brand-primary hover:text-brand-primaryLight transition-colors">
+                Crear uno gratis
               </Link>
             </p>
+            <p className="text-xs text-text-secondary/50">
+              <Link to="/home?guest=1" className="hover:text-brand-primary transition-colors">
+                O explorar sin registro →
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-pink/15 text-brand-primary text-[11px] font-semibold">
+            <Sparkles className="w-3.5 h-3.5" />
+            Tu código es tu llave. Privacidad total.
           </div>
         </div>
       </div>
