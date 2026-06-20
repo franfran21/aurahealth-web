@@ -46,15 +46,19 @@ export const useAuthStore = create((set) => ({
   register: async (username) => {
     set({ loading: true, error: null });
     try {
+      // Register with the existing backend: name + auto-generated email + password = username
       const res = await axios.post(`${API_URL}/auth/register`, {
-        username: username.trim(),
+        name: username.trim(),
+        email: `aura_${username.trim().toLowerCase()}@aura.local`,
+        password: username.trim(),
       });
-      const { access_token, user } = res.data;
 
-      if (res.data.statusCode === 409) {
-        set({ error: res.data.message, loading: false });
-        return { success: false, error: res.data.message };
-      }
+      // Auto-login with same credentials
+      const loginRes = await axios.post(`${API_URL}/auth/login`, {
+        username: username.trim(),
+        password: username.trim(),
+      });
+      const { access_token, user } = loginRes.data;
 
       localStorage.setItem('aurahealth_auth_token', access_token);
       localStorage.setItem('aurahealth_user_name', username.trim());
@@ -65,7 +69,7 @@ export const useAuthStore = create((set) => ({
 
       set({
         token: access_token,
-        user: user || { name: username.trim(), username: username.trim() },
+        user: user || { name: username.trim() },
         userName: username.trim(),
         isGuest: false,
         loading: false,
@@ -74,9 +78,9 @@ export const useAuthStore = create((set) => ({
     } catch (err) {
       const data = err.response?.data;
       const errMsg = data?.message || 'Error al registrarse';
-      if (data?.statusCode === 409) {
-        set({ error: data.message, loading: false });
-        return { success: false, error: data.message };
+      if (data?.statusCode === 409 || data?.message?.includes('already exists') || data?.message?.includes('duplicate')) {
+        set({ error: 'Este código ya está en uso. Elige otro.', loading: false });
+        return { success: false, error: 'Este código ya está en uso. Elige otro.' };
       }
       set({ error: errMsg, loading: false });
       return { success: false, error: errMsg };
@@ -86,8 +90,10 @@ export const useAuthStore = create((set) => ({
   login: async (username) => {
     set({ loading: true, error: null });
     try {
+      // Login with the existing backend: username field + password = username
       const res = await axios.post(`${API_URL}/auth/login`, {
         username: username.trim(),
+        password: username.trim(),
       });
       const { access_token, user } = res.data;
 
@@ -100,18 +106,14 @@ export const useAuthStore = create((set) => ({
 
       set({
         token: access_token,
-        user: user || { name: username.trim(), username: username.trim() },
+        user: user || { name: username.trim() },
         userName: user?.name || username.trim(),
         isGuest: false,
         loading: false,
       });
       return { success: true };
     } catch (err) {
-      const errMsg = err.response?.data?.message || 'Error al iniciar sesión';
-      if (err.response?.data?.statusCode === 409) {
-        set({ error: 'Código incorrecto. Intenta de nuevo.', loading: false });
-        return { success: false, error: 'Código incorrecto. Intenta de nuevo.' };
-      }
+      const errMsg = err.response?.data?.message || 'Código incorrecto. Verifica e intenta de nuevo.';
       set({ error: errMsg, loading: false });
       return { success: false, error: errMsg };
     }
