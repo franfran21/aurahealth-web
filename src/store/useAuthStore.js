@@ -75,7 +75,7 @@ export const useAuthStore = create((set) => ({
 
       // Login automático
       const loginRes = await axios.post(`${API_URL}/auth/login`, {
-        username: name.trim(),
+        email: email.trim(),
         password,
       });
 
