@@ -38,7 +38,7 @@ export const useAuthStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await axios.post(`${API_URL}/auth/login`, {
-        email: email.trim(),
+        username: email.trim(),
         password,
       });
       const { access_token, user } = res.data;
@@ -75,7 +75,7 @@ export const useAuthStore = create((set) => ({
 
       // Login automático
       const loginRes = await axios.post(`${API_URL}/auth/login`, {
-        email: email.trim(),
+        username: email.trim(),
         password,
       });
 
